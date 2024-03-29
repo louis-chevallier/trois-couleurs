@@ -3,6 +3,7 @@ from utillc import *
 import sys
 import sympy
 from sympy import symbols
+import matplotlib.pyplot as plt 
 
 
 a,b,c,d,x = symbols("a,b,c,d,x", real=True)
@@ -19,13 +20,20 @@ EKOX(s)
 
 b,c,d = 11/6, 1/2, -1/3
 
-crot = lambda x : np.round(b*x + c*x*x + d*x*x*x).astype(int)
+# rotation les couleurs
+# 0=> 0
+# 1 => 2
+# 2 => 3
+# 3 => 1
+@jit
+def crot(x : np.array) -> np.array:
+    return np.round(b*x + c*x*x + d*x*x*x).astype(int)
 
 EKOX([ crot(x) for x in range(4)])
 
 
 # la taille d'un plateau : N x N
-N = 4
+N = 3
 
 # 0 : vide, 1, 2, 3 les 3 couleurs
 
@@ -43,10 +51,16 @@ class Node :
     """
     coords : y,x
     """
-    def __init__(self, b) :
+    def __init__(self, b: np.array) :
         self.board = b
 
-    def normal(self) :
+    @jit
+    def normal(self) -> int:
+        """
+        calcule une représentation unique quelquesoit les variantes qui sont équivalentes
+        => par rotation symetries
+        => par changement de couleur
+        """
         b = self.board
         b1 = np.flipud(b)
         b2 = np.fliplr(b)
@@ -62,12 +76,13 @@ class Node :
         ss = sorted(ss)
         return ss[0]
         
-
+    @jit
     def empty(self) :
         res = np.argwhere(self.board == 0)
         return res
 
-    def neighbours(self, c, filled = True) :
+    @jit
+    def neighbours(self, c : tuple, filled = True) -> list:
         y, x = c
         l = [ (y, x+1), (y, x-1), (y+1, x), (y-1, x) ]
 
@@ -77,7 +92,8 @@ class Node :
         else :
             l = [ (yy,xx) for (yy, xx) in l if xx >= 0 and xx < N and yy >= 0 and yy < N and self.board[yy, xx] == 0]
         return l
-    
+
+    @jit    
     def possible_moves(self) :
         e = self.empty()
         res = []
@@ -92,7 +108,8 @@ class Node :
             for e in colors_available : res += [ ( c, e) ]
         return res
 
-    def apply(self, m) :
+    @jit
+    def apply(self, m : tuple) -> np.array :
         (y, x), col = m
         b = self.board.copy()
         b[y, x] = col
@@ -102,7 +119,10 @@ n = Node(zero())
 
 step = 0
 front = [n]
-breadth_first = False
+max_front = 1
+breadth_first = True
+cc=[]
+EKO()
 while(True) :
     #EKOX((step, len(front)))
     p = front.pop(0)
@@ -123,7 +143,25 @@ while(True) :
             front = front + nexts
         else :
             front = nexts + front
-        step += 1
+    else :
+        #EKOT(seen[nn])
+        pass
+    #EKOX(len(seen))
+    step += 1
+
+    #if len(front) > max_front :        EKOX(len(front))
+    max_front = max(max_front, len(front))
+    cc.append(len(front))
+
+    if len(cc) > 100000 :
+        plt.plot(cc)
+        plt.show()
+
+
+    
     if len(front) == 0  :
-        EKO()
+        EKOX(len(seen))
+        #plt.plot(cc)
+        #plt.show()
+        
         break
