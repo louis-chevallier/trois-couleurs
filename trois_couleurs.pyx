@@ -27,6 +27,9 @@ A: NDArray[Shape2D[ROWS, COLS]] = np.zeros((2,3))
 B: NDArray[Shape2D[COLS, ROWS]] = np.zeros((3,2))
 C: NDArray[Shape2D[ROWS, ROWS]] = np.dot(A, B)
 
+print("coucou")
+utillc.print_everything()
+EKO()
 sys.exit(0)
 
 
