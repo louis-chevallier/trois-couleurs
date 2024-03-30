@@ -30,7 +30,6 @@ C: NDArray[Shape2D[ROWS, ROWS]] = np.dot(A, B)
 print("coucou")
 utillc.print_everything()
 EKO()
-sys.exit(0)
 
 
 a,b,c,d,x = symbols("a,b,c,d,x", real=True)
@@ -156,7 +155,7 @@ while(True) :
     emp = (p.board == 0).sum()
 
     if emp < min_emp :
-        EKOX(min_emp)
+        print("min_emp %d" % min_emp)
     min_emp = min(min_emp, emp)
     
     if nn not in seen :
@@ -188,12 +187,9 @@ while(True) :
     if len(cc) % 100000  == 0:
         plt.plot(cc)
         plt.show()
-
-
     
     if len(front) == 0  :
-        EKOX(len(seen))
+        print("seen %d" % len(seen))
         #plt.plot(cc)
         #plt.show()
-        
         break

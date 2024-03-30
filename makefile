@@ -1,8 +1,8 @@
 
 start :
-	python trois_couleurs.py
+	time python trois_couleurs.pyx
 	python setup.py build_ext --inplace
-	cython trois_couleurs.py
-	python -c 'import trois_couleurs'
+	cython trois_couleurs.pyx
+	time python -c 'import trois_couleurs'
 
 
