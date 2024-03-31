@@ -122,11 +122,9 @@ def normal(bb) -> int:
     l4 = [ crot(e) for e in l3]
     l5 = [ crot(e) for e in l4]
     
-
     def hh(b) :
         xx = b * factors
         return xx.sum()
-
     
     ss = [ hh(e) for e in l + l1 + l2 + l3 + l4 + l5 ]
     ss = sorted(ss)
@@ -156,6 +154,7 @@ class Node :
     def __init__(self, b: TT, father = None) :
         self.board = b
         self.losing = False
+        self.father = father
         self.children = []
         if father is not None :
             father.children.append(self)
@@ -169,10 +168,11 @@ class Node :
         l = [ (y, x+1), (y, x-1), (y+1, x), (y-1, x) ]
 
         if filled :
-            l = [ (yy,xx) for (yy, xx) in l if xx >= 0 and xx < N and yy >= 0 and yy < N and self.board[yy, xx] > 0]
-
+            l = [ (yy,xx) for (yy, xx) in l if
+                  xx >= 0 and xx < N and yy >= 0 and yy < N and self.board[yy, xx] > 0]
         else :
-            l = [ (yy,xx) for (yy, xx) in l if xx >= 0 and xx < N and yy >= 0 and yy < N and self.board[yy, xx] == 0]
+            l = [ (yy,xx) for (yy, xx) in l if
+                  xx >= 0 and xx < N and yy >= 0 and yy < N and self.board[yy, xx] == 0]
         return l
 
     def possible_moves(self) :
@@ -204,8 +204,6 @@ class Node :
 root = Node(zero())
 seen = {}
 
-
-
 step = 0
 front = [root]
 max_front = 1
@@ -215,23 +213,28 @@ cc=[]
 EKO()
 
 def parse(r, tab) :
+    if normal(r) in seen :
+        r = seen[normal(r)]
+
     p = ('\n' + tab + 'losing=' + str(r.losing) +
-        '\n' + tab + 'level=' + str(r.level()) +    
-        '\n' + tab + str(r.board[0]) +
-        '\n' + tab + str(r.board[1]))
+         '\n' + tab + 'level=' + str(r.level()) +    
+         '\n' + tab + str(r.board[0]) +
+         '\n' + tab + str(r.board[1]))
     ss = ''.join([ parse(c, tab + '\t') for c in r.children])
     return p + ss
 
 def check(r, father, hh) :
+    if normal(r.board) in seen :
+        r = seen[normal(r.board)]
+
     assert(normal(r.board) not in hh)
     hh1 = dict(hh)
     hh1[normal(r.board)] = r
-    EKOX(r.level())
+    #EKOX(r.level())
     if father is not None :
         assert(father.level() == r.level() - 1)
-    EKOX([( r.level(), c.level()) for c in r.children])
+    #EKOX([( r.level(), c.level()) for c in r.children])
     [ check(c, r, hh1) for c in r.children]    
-
 
 while(True) :
     #EKOX((step, len(front)))
@@ -251,15 +254,12 @@ while(True) :
     if emp >= 0 :
         if nn in seen :
             assert(seen[nn].level() == p.level())
-            
             #EKOX(p.eq("1201"))
             #EKOX(step)
             #EKOX(seen[nn].board)
             #EKOX(p.board)
             #EKOX(parse(seen[nn], ''))
-            p.children = seen[nn].children
             #EKOX(parse(p, ''))
-            
         else :
             seen[nn] = p            
             ms = p.possible_moves()
@@ -299,10 +299,12 @@ while(True) :
 
 
 def solve(r) :
+    if normal(r.board) in seen :
+        r = seen[normal(r.board)]
     for c in r.children :
         assert(r.level() + 1 == c.level())
         solve(c)
-    r.losing = all([ (not c.losing) for c in r.children])
+        r.losing = all([ (not c.losing) for c in r.children])
 
 EKO()
 check(root, None, {})
