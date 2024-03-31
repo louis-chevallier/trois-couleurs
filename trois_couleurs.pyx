@@ -31,6 +31,7 @@ C: NDArray[Shape2D[ROWS, ROWS]] = np.dot(A, B)
 utillc.print_everything()
 EKO()
 
+
 """
  rotation les couleurs
 
@@ -47,7 +48,7 @@ et
 # 2 => 3
 # 3 => 2
 
-comme ca on a tout par : x, crot(x), crot(crot(x)), crot2(x), crot(crot2(x)), crot(crot(crot2(x)))
+ on a tout par : x, crot(x), crot(crot(x)), crot2(x), crot(crot2(x)), crot(crot(crot2(x)))
 
 """
 
@@ -62,9 +63,7 @@ def rot_func(t) :
 
     s = sympy.solve(eq, [a,b,c,d])
     EKOX(s)
-    
     b,c,d = map(float, (s[b], s[c], s[d]))
-    
     EKOX((b,c,d))
     
     def crot(x : np.ndarray) -> np.ndarray:
@@ -78,11 +77,15 @@ EKOX([ crot(x) for x in range(4)])
 EKOX([ crot2(x) for x in range(4)])
 
 
-N = 2
+N = 3
 N_ = Literal[N]
 # la taille d'un plateau : N x N
 TT = NDArray[Shape2D[N_, N_]]
 
+factors = [ 4**i for i in range(N*N)]
+EKOX(factors)
+factors = np.asarray(factors).reshape((N, N))
+EKOX(factors)
 
 # 0 : vide, 1, 2, 3 les 3 couleurs
 
@@ -93,10 +96,6 @@ def zero() -> TT :
     b = np.zeros(shape = (N, N)).astype(np.ubyte)
     return b
 
-
-seen = {}
-
-
 def normal(bb) -> int:
     """
     calcule une représentation unique quelquesoit les variantes qui sont équivalentes
@@ -106,14 +105,7 @@ def normal(bb) -> int:
     emp = (bb == 0).sum()
     if emp == N*N :
         return 0
-    def chk(x, l) :
-        for ie, e in enumerate(l) :
-            if np.array_equal(e, x) :
-                EKOX(ie)
-                EKOX(x)
-                EKOX(e)
-                assert(False )
-
+    
     b = bb
     b1 = np.flipud(b); 
     b2 = np.fliplr(b); 
@@ -131,11 +123,16 @@ def normal(bb) -> int:
     l5 = [ crot(e) for e in l4]
     
 
-    ss = [ hash(e.tobytes()) for e in l + l1 + l2 + l3 + l4 + l5 ]
+    def hh(b) :
+        xx = b * factors
+        return xx.sum()
+
+    
+    ss = [ hh(e) for e in l + l1 + l2 + l3 + l4 + l5 ]
     ss = sorted(ss)
     return ss[0]
 
-
+"""
 aa = np.asarray([[ 1,2,3,1],
                  [ 1,0,0,0],
                  [ 1,1,0,0],
@@ -146,7 +143,11 @@ aa = np.asarray([[ 1,2,3,2],
                  [ 1,1,1,0],
                  [ 1,0,0,0]])
 EKOX(normal(aa))
-
+aan = Node(aa)
+ms = aan.possible_moves()
+nexts = [ aan.apply(m) for m in ms]
+#EKOX(nexts)
+"""
 
 class Node :
     """
@@ -154,7 +155,7 @@ class Node :
     """
     def __init__(self, b: TT, father = None) :
         self.board = b
-        self.father = father
+        self.losing = False
         self.children = []
         if father is not None :
             father.children.append(self)
@@ -188,6 +189,12 @@ class Node :
             for e in colors_available : res += [ ( c, e) ]
         return res
 
+    def eq(self, nn) :
+        return nn == ''.join(map(str,self.board.flatten()))
+
+    def level(self) :
+        return N*N - (self.board == 0).sum()
+    
     def apply(self, m : tuple) -> np.array :
         (y, x), col = m
         b = self.board.copy()
@@ -195,11 +202,8 @@ class Node :
         return b
 
 root = Node(zero())
+seen = {}
 
-aan = Node(aa)
-ms = aan.possible_moves()
-nexts = [ aan.apply(m) for m in ms]
-#EKOX(nexts)
 
 
 step = 0
@@ -209,6 +213,26 @@ min_emp = N*N
 breadth_first = True
 cc=[]
 EKO()
+
+def parse(r, tab) :
+    p = ('\n' + tab + 'losing=' + str(r.losing) +
+        '\n' + tab + 'level=' + str(r.level()) +    
+        '\n' + tab + str(r.board[0]) +
+        '\n' + tab + str(r.board[1]))
+    ss = ''.join([ parse(c, tab + '\t') for c in r.children])
+    return p + ss
+
+def check(r, father, hh) :
+    assert(normal(r.board) not in hh)
+    hh1 = dict(hh)
+    hh1[normal(r.board)] = r
+    EKOX(r.level())
+    if father is not None :
+        assert(father.level() == r.level() - 1)
+    EKOX([( r.level(), c.level()) for c in r.children])
+    [ check(c, r, hh1) for c in r.children]    
+
+
 while(True) :
     #EKOX((step, len(front)))
     p = front.pop(0)
@@ -216,19 +240,29 @@ while(True) :
 
     emp = (p.board == 0).sum()
 
+    if p.eq("1201") :    EKO()
+    #EKOX(step)
+    #EKOX(parse(root, ""))
+    #check(root, None)
     if emp < min_emp :
         EKOT("min_emp %d, seen %d" % (min_emp, len(seen)))
     min_emp = min(min_emp, emp)
 
     if emp >= 0 :
-
         if nn in seen :
-            p.children.append(seen[nn])
-        else :
-            seen[nn] = p
+            assert(seen[nn].level() == p.level())
             
+            #EKOX(p.eq("1201"))
+            #EKOX(step)
+            #EKOX(seen[nn].board)
+            #EKOX(p.board)
+            #EKOX(parse(seen[nn], ''))
+            p.children = seen[nn].children
+            #EKOX(parse(p, ''))
+            
+        else :
+            seen[nn] = p            
             ms = p.possible_moves()
-
             """
             if len(ms) == 0 and len(p.empty()) == 2:
                 EKOX(p.empty())
@@ -260,21 +294,27 @@ while(True) :
         #EKOT("seen %d" % len(seen))
         #plt.plot(cc)
         #plt.show()
+        EKO()
         break
 
 
 def solve(r) :
     for c in r.children :
+        assert(r.level() + 1 == c.level())
         solve(c)
     r.losing = all([ (not c.losing) for c in r.children])
 
-    
+EKO()
+check(root, None, {})
+EKO()
 solve(root)
 EKOX(root.losing)
 
-def parse(r, tab) :
-    p = '\n' + tab + str(r.losing) + '\n' + tab + str(r.board[0]) + '\n' + tab + str(r.board[1])
-    ss = ''.join([ parse(c, tab + '\t') for c in r.children])
-    return p + ss
 
-EKOX(parse(root, ""))
+#EKOX(parse(root, ""))
+
+
+
+
+
+
