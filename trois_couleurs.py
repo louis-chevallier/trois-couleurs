@@ -92,13 +92,8 @@ def rot_func(t) :
     f1j = jit(f1, nopython=True)
     return f1j
 
-def xlxlxl() :
-    bf,cf,df = map(float, (s[b], s[c], s[d]))
-    EKOX((bf,cf,df))
-    EKOX('ff')    
-    return np.round(bf*xx + cf*xx*xx + df*xx*xx*xx).astype(int)
 
-
+# pour construire toutes les variantes équivalentes en couleur d'une position
 EKO()
 crotf_ =  rot_func((2, 3, 1))
 crot2f_ = rot_func((1, 3, 2))
@@ -107,8 +102,6 @@ crot2f = lambda x : np.round(crot2f_(x)).astype(np.uint8)
 
 ar = lambda x : np.asarray(x)
 aa = ar((0, 1,2,3))
-
-
 
 
 EKOX(aa)
@@ -121,34 +114,39 @@ EKOX(crot2f(crotf(aa)))
 EKON([ crotf(x) for x in range(4)])
 EKOX([ crot2f(x) for x in range(4)])
 
+DDD = 4
 
-N = 3
+DN,DM = DDD, DDD # DN == DM car le calcul de symetries l'obligent
 EKOT('cc')
-N_ = Literal[N]
+DN_ = Literal[DN]
+DM_ = Literal[DM]
 EKOT('bb')
 # la taille d'un plateau : N x N
-TT = NDArray[Shape2D[N_, N_]]
+TT = NDArray[Shape2D[DN_, DM_]]
 EKOT('aa')
 
-factors = [ 4**i for i in range(N*N)]
+factors = [ 4**i for i in range(DN*DM)]
+EKOX(factors[-1])
+EKOX(pow(factors[-1], 1/(DN*DM - 1)))
 EKOX(('factors', factors))
-factors = np.asarray(factors).reshape((N, N))
-EKOX(factors)
+factors = np.asarray(factors).reshape((DN, DM))
+EKOX(factors.shape)
 EKOX(('factors', factors))
 
+# codage des couleurs
 # 0 : vide, 1, 2, 3 les 3 couleurs
 
 colors = set([1,2,3])
 
+# codage d'une position : le tableau => un nombre
 def hh(b : TT) -> numpy.int64 :
     xx = b * factors
     return xx.sum()
 
 
-
 # random board
 def random() -> TT :
-    b = np.random.uniform(0, 3, size=(N, N)).round().astype(np.uint8)
+    b = np.random.uniform(0, 3, size=(DN, DM)).round().astype(np.uint8)
     return b
 
 aa = random()
@@ -159,11 +157,9 @@ EKOX(hh(crot2f(aa)))
 EKOX(hh(crotf(crot2f(aa))))
 EKOX(hh(crot2f(crotf(aa))))
 
-
-
-#board
+#board vide
 def zero() -> TT :
-    b = np.zeros(shape = (N, N)).astype(np.uint8)
+    b = np.zeros(shape = (DN, DM)).astype(np.uint8)
     return b
 
 #@jit(nopython=True)
@@ -174,7 +170,7 @@ def normal(bb : TT) -> numpy.int64:
     => par changement de couleur
     """
     emp = (bb == 0).sum()
-    if emp == N*N :
+    if emp == DN*DM :
         return 0
     
     b = bb
@@ -192,8 +188,7 @@ def normal(bb : TT) -> numpy.int64:
     l2 = map(crotf, l1)
     l3 = map(crot2f, l)
     l4 = map(crotf, l3)
-    l5 = map(crot2f, l1)
-    
+    l5 = map(crot2f, l1)    
     ss = map(hh, chain(l0, l1, l2, l3, l4, l5))
     ss = sorted(ss)
     return ss[0]
@@ -215,35 +210,64 @@ nexts = [ aan.apply(m) for m in ms]
 #EKOX(nexts)
 """
 
+node_number = 0
+def inc() :
+    global node_number
+    x = node_number
+    node_number += 1
+    return x
+
+
 class Node :
     """
-    coords : y,x
+    les noeuds de l'arbre
+    coords dans le tableau: y,x
     """
+    
     def __init__(self, b: TT, father = None) :
+        self.number = inc()
         self.board = b
-        self.losing = False
+        self.losing = "?" # pour celui qui doit jouer dans cette position
         self.father = father
         self.children = []
+        
+        # les noeuds équivalents sont chainés entre eux
+        self.friend = None
+        
         if father is not None :
             father.children.append(self)
+
+    def name(self) :
+        return "n" + str(self.number) 
+
+            
+    def chain(self, ref) :
+        assert(self.friend == None)
+        self.friend = ref
         
     def empty(self) -> NDArray :
         res = np.argwhere(self.board == 0)
         return res
 
     def neighbours(self, c : NDArray, filled = True) -> list:
+        """
+        cases voisines de c
+        """
         y, x = c
         l = [ (y, x+1), (y, x-1), (y+1, x), (y-1, x) ]
 
         if filled :
             l = [ (yy,xx) for (yy, xx) in l if
-                  xx >= 0 and xx < N and yy >= 0 and yy < N and self.board[yy, xx] > 0]
+                  xx >= 0 and xx < DM and yy >= 0 and yy < DN and self.board[yy, xx] > 0]
         else :
             l = [ (yy,xx) for (yy, xx) in l if
-                  xx >= 0 and xx < N and yy >= 0 and yy < N and self.board[yy, xx] == 0]
+                  xx >= 0 and xx < DM and yy >= 0 and yy < DN and self.board[yy, xx] == 0]
         return l
 
     def possible_moves(self) :
+        """
+        les positions atteignables à partir de celle là
+        """
         e = self.empty()
         res = []
         for c in e :
@@ -261,7 +285,7 @@ class Node :
         return nn == ''.join(map(str,self.board.flatten()))
 
     def level(self) :
-        return N*N - (self.board == 0).sum()
+        return DN*DM - (self.board == 0).sum()
     
     def apply(self, m : tuple) -> np.array :
         (y, x), col = m
@@ -276,8 +300,8 @@ seen = {}
 step = 0
 
 max_front = 1
-min_empty_cells = N*N * 12
-breadth_first = True
+min_empty_cells = DN*DM * 12
+breadth_first = False # otherwise depth first
 cc=[]
 EKO()
 
@@ -292,21 +316,93 @@ def parse(r, tab) :
     ss = ''.join([ parse(c, tab + '\t') for c in r.children])
     return p + ss
 
-def check(r, father, hh) :
-    if normal(r.board) in seen :
-        r = seen[normal(r.board)]
+        
 
-    assert(normal(r.board) not in hh)
-    hh1 = dict(hh)
-    hh1[normal(r.board)] = r
-    #EKOX(r.level())
+def dump(n, t="") :
+    EKON(normal(n.board), n.level())
+    for e in n.children :
+        dump(e, t+"\t")
+
+def check(r, father) :
     if father is not None :
         assert(father.level() == r.level() - 1)
     #EKOX([( r.level(), c.level()) for c in r.children])
-    [ check(c, r, hh1) for c in r.children]    
+    [ check(c, r) for c in r.children]    
 
 
+step_count = 0
+def plus() :
+    global step_count
+    step_count += 1
+    return step_count
+
+
+def build(p : Node) :
+    """
+    recursive prog
+    """
+    istep = plus()
+    nn = normal(p.board)
+
+    empy_cells_num = (p.board == 0).sum()
+    #EKON(empy_cells_num, min_empty_cells)
+    if p.eq("1201") :    EKO()
+    #EKOX(step)
+    #EKOX(parse(root, ""))
+    #check(root, None)
+
+    if empy_cells_num >= 0 :
+        if nn in seen :
+            assert(seen[nn].level() == p.level())
+            # on a déjà traité un noeud de clé identique : q = seen[nn]
+            # pas besoin de poursuivre
+            p.chain(ref = seen[nn]);
+        else :
+            seen[nn] = p            
+            ms = p.possible_moves()
+            if len(ms) == 0 :
+                p.losing = True
+            else :
+                ls = []
+                p.losing = True
+                for m in ms :
+                    new_node  = Node(p.apply(m), p)
+                    build(new_node)
+                    if new_node.losing :
+                        p.losing = False
+                        break
+                    ls.append(new_node)
+    else :
+        # terminal node
+        EKON(min_empty_cells, len(seen), nn, istep)
+        EKOX(p.board)
+        
+def solve(r) :
+    # friend must have been visited yet
+    if r.friend is not None :
+        r.losing = r.friend.losing
+    else :
+        for c in r.children :
+            assert(r.level() + 1 == c.level())
+            solve(c)
+            # no children => empty list => True
+        r.losing = all([ (not c.losing) for c in r.children])
+
+
+
+root = Node(zero())
+seen = {}
+EKOT("re building...")
+build(root)
+EKOX(step_count)
+EKOX(node_number)
+solve(root)
+EKOX(root.losing)
+
+        
+# construction de l'arbre en profondeur ou en largeur d'abord
 EKOX(front[0].board)
+EKOT("building...")
 for istep in range(999999) :
     #EKOX((step, len(front)))
     p = front.pop(0)
@@ -318,15 +414,21 @@ for istep in range(999999) :
     #EKOX(step)
     #EKOX(parse(root, ""))
     #check(root, None)
+
+    """
     if empy_cells_num < min_empty_cells :
         min_empty_cells = min(min_empty_cells, empy_cells_num)
         EKON(min_empty_cells, len(seen), len(front), istep)
         EKOX(p.board)
-        
+    """ 
 
     if empy_cells_num >= 0 :
         if nn in seen :
             assert(seen[nn].level() == p.level())
+
+            # on a déjà traité un noeud de clé identique : q = seen[nn]
+            # pas besoin de poursuivre
+            p.chain(ref = seen[nn]);
             #EKOX(p.eq("1201"))
             #EKOX(step)
             #EKOX(seen[nn].board)
@@ -336,18 +438,14 @@ for istep in range(999999) :
         else :
             seen[nn] = p            
             ms = p.possible_moves()
-            """
-            if len(ms) == 0 and len(p.empty()) == 2:
-                EKOX(p.empty())
-                EKOX(len(p.empty()))
-                EKOX(p.board)
-            """
-            #EKOX(ms)
-            nexts = [ Node(p.apply(m), p) for m in ms]
-            if breadth_first :
-                front = front + nexts
+            if len(ms) == 0 :
+                p.losing = True
             else :
-                front = nexts + front
+                nexts = [ Node(p.apply(m), p) for m in ms]
+                if breadth_first :
+                    front = front + nexts
+                else :
+                    front = nexts + front
 
         #EKOX(len(seen))
         step += 1
@@ -356,13 +454,14 @@ for istep in range(999999) :
         max_front = max(max_front, len(front))
         cc.append(len(front))
 
-        if len(seen) > 10000 :
-            break
-
+        #if len(seen) > 10000 : break
+        """
         if len(cc) % 100000  == 0:
             plt.plot(cc)
             plt.show()
+        """
     else :
+        # terminal node
         EKON(min_empty_cells, len(seen), nn, istep)
         EKOX(p.board)
         
@@ -373,22 +472,41 @@ for istep in range(999999) :
         EKO()
         break
 
+EKOX(node_number)
 
 EKON(len(seen), istep)
-def solve(r) :
-    if normal(r.board) in seen :
-        r = seen[normal(r.board)]
-    for c in r.children :
-        assert(r.level() + 1 == c.level())
-        solve(c)
-        r.losing = all([ (not c.losing) for c in r.children])
+def dot(r, fd) :
+    status = "L" if r.losing else "W"
+    nrm = normal(r.board)
+    ref = "ref:" + seen[nrm].name() if nrm in seen else ""
+    board = str(r.board)
+    bb = ""
+    fd.write(r.name() + ' [ label="' + r.name() + " " + status + ' \\n ' + bb + " " + ref + '"]')
+    for e in r.children :
+        fd.write("n" + str(r.number) + " -> n" + str(e.number) + ";\n")
+        dot(e, fd)
 
+
+
+        
 EKO()
+check(root, None)
+EKO()
+solve(root)
+EKOX(root.losing)
+
+
+
+
+if False :
+    with open('dot.dot', 'w') as f:
+        f.write("digraph troiscouleurs {")
+        dot(root, f)
+        f.write("}")
+    
+
 
 #check(root, None, {})
-EKO()
-#solve(root)
-EKOX(root.losing)
 
 
 
