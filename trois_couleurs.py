@@ -293,11 +293,6 @@ class Node :
         b[y, x] = col
         return b
 
-root = Node(zero())
-front = [root]
-seen = {}
-
-step = 0
 
 max_front = 1
 min_empty_cells = DN*DM * 12
@@ -390,8 +385,8 @@ def solve(r) :
 
 
 
-root = Node(zero())
-seen = {}
+root, seen = Node(zero()), {}
+
 EKOT("re building...")
 build(root)
 EKOX(step_count)
@@ -399,6 +394,9 @@ EKOX(node_number)
 solve(root)
 EKOX(root.losing)
 
+root, seen = Node(zero()), {}
+front = [root]
+step = 0
         
 # construction de l'arbre en profondeur ou en largeur d'abord
 EKOX(front[0].board)
