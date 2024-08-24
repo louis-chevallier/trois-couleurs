@@ -35,7 +35,7 @@ C: NDArray[Shape2D[ROWS, ROWS]] = np.dot(A, B)
 
 
 utillc.print_everything()
-EKO()
+
 
 import inspect, os
 
@@ -78,23 +78,23 @@ def rot_func(t) :
     
     p = a + b*x + c*x*x + d*x*x*x
     s = sympy.solve(eq, [a,b,c,d])
-    EKOX(s)
-    EKOX(p.subs(s))
+    #EKOX(s)
+    #EKOX(p.subs(s))
     #f1 = lambdify([ a, b, c, d], s, "numpy")
 
     f1 = lambdify([ x ], p.subs(s), "numpy")
     
-    EKOX(t)
-    EKOX(f1(1))
-    EKOX(f1(2))
-    EKOX(f1(3))
+    #EKOX(t)
+    #EKOX(f1(1))
+    #EKOX(f1(2))
+    #EKOX(f1(3))
     
     f1j = jit(f1, nopython=True)
     return f1j
 
 
 # pour construire toutes les variantes équivalentes en couleur d'une position
-EKO()
+#EKO()
 crotf_ =  rot_func((2, 3, 1))
 crot2f_ = rot_func((1, 3, 2))
 crotf = lambda x : np.round(crotf_(x)).astype(np.uint8) 
@@ -104,6 +104,7 @@ ar = lambda x : np.asarray(x)
 aa = ar((0, 1,2,3))
 
 
+"""
 EKOX(aa)
 EKOX(crotf(aa))
 EKOX(crotf(crotf(aa)))
@@ -113,22 +114,25 @@ EKOX(crot2f(crotf(aa)))
 
 EKON([ crotf(x) for x in range(4)])
 EKOX([ crot2f(x) for x in range(4)])
-
+"""
 DDD = 4
 
 DN,DM = DDD, DDD # DN == DM car le calcul de symetries l'obligent
-EKOT('cc')
 DN_ = Literal[DN]
 DM_ = Literal[DM]
-EKOT('bb')
+taille_plateau = (DN, DM)
+assert(DN== DM) # on veut un tableau carré because, on gere pas les rotations autrement
+
 # la taille d'un plateau : N x N
 TT = NDArray[Shape2D[DN_, DM_]]
-EKOT('aa')
+EKON(taille_plateau)
 
+# coding cells
 factors = [ 4**i for i in range(DN*DM)]
-EKOX(factors[-1])
-EKOX(pow(factors[-1], 1/(DN*DM - 1)))
-EKOX(('factors', factors))
+if False :
+    EKOX(factors[-1])
+    EKOX(pow(factors[-1], 1/(DN*DM - 1)))
+    EKOX(('factors', factors))
 factors = np.asarray(factors).reshape((DN, DM))
 EKOX(factors.shape)
 EKOX(('factors', factors))
@@ -140,25 +144,33 @@ colors = set([1,2,3])
 
 # codage d'une position : le tableau => un nombre
 def hh(b : TT) -> numpy.int64 :
+    """ codage d'une position : le tableau => un nombre    
+    """
     xx = b * factors
     return xx.sum()
 
 
 # random board
 def random() -> TT :
+    """
+    random board
+    """
     b = np.random.uniform(0, 3, size=(DN, DM)).round().astype(np.uint8)
     return b
 
 aa = random()
-EKOX(hh(aa))
-EKOX(hh(crotf(aa)))
-EKOX(hh(crotf(crotf(aa))))
-EKOX(hh(crot2f(aa)))
-EKOX(hh(crotf(crot2f(aa))))
-EKOX(hh(crot2f(crotf(aa))))
+if False :
+    EKOX(hh(aa))
+    EKOX(hh(crotf(aa)))
+    EKOX(hh(crotf(crotf(aa))))
+    EKOX(hh(crot2f(aa)))
+    EKOX(hh(crotf(crot2f(aa))))
+    EKOX(hh(crot2f(crotf(aa))))
 
 #board vide
 def zero() -> TT :
+    """ empty board
+    """
     b = np.zeros(shape = (DN, DM)).astype(np.uint8)
     return b
 
@@ -166,7 +178,7 @@ def zero() -> TT :
 def normal(bb : TT) -> numpy.int64:
     """
     calcule une représentation unique quelquesoit les variantes qui sont équivalentes
-    => par rotation symetries
+    => par rotation et symetries
     => par changement de couleur
     """
     emp = (bb == 0).sum()
@@ -229,6 +241,8 @@ class Node :
         self.board = b
         self.losing = "?" # pour celui qui doit jouer dans cette position
         self.father = father
+
+        # descendant, order == Node creation order 
         self.children = []
         
         # les noeuds équivalents sont chainés entre eux
@@ -296,9 +310,8 @@ class Node :
 
 max_front = 1
 min_empty_cells = DN*DM * 12
-breadth_first = False # otherwise depth first
+
 cc=[]
-EKO()
 
 def parse(r, tab) :
     if normal(r) in seen :
@@ -319,6 +332,9 @@ def dump(n, t="") :
         dump(e, t+"\t")
 
 def check(r, father) :
+    """
+    sanity check of the built tree
+    """
     if father is not None :
         assert(father.level() == r.level() - 1)
     #EKOX([( r.level(), c.level()) for c in r.children])
@@ -332,9 +348,9 @@ def plus() :
     return step_count
 
 
-def build(p : Node) :
+def recursive_build(p : Node) :
     """
-    recursive prog
+    recursive prog, donc profondeur d'abord
     """
     istep = plus()
     nn = normal(p.board)
@@ -362,8 +378,9 @@ def build(p : Node) :
                 p.losing = True
                 for m in ms :
                     new_node  = Node(p.apply(m), p)
-                    build(new_node)
+                    recursive_build(new_node)
                     if new_node.losing :
+                        # alpha beta pruning
                         p.losing = False
                         break
                     ls.append(new_node)
@@ -373,32 +390,41 @@ def build(p : Node) :
         EKOX(p.board)
         
 def solve(r) :
-    # friend must have been visited yet
+    """
+    assuming depth first stat (or recursive), friend must have been visited yet
+    """
     if r.friend is not None :
+        assert(r.number > r.friend.number)
         r.losing = r.friend.losing
     else :
         for c in r.children :
             assert(r.level() + 1 == c.level())
             solve(c)
             # no children => empty list => True
+        # 'relative' losing == the gain for the player in this position
+        # i win if one among next positions is losing for the other player 
+        # i loose if all  next positions is wining for the other player 
         r.losing = all([ (not c.losing) for c in r.children])
 
-
-
-root, seen = Node(zero()), {}
+node_number, root, seen = 0, Node(zero()), {}
 
 EKOT("re building...")
-build(root)
+recursive_build(root)
+EKON(len(seen))
 EKOX(step_count)
 EKOX(node_number)
 solve(root)
 EKOX(root.losing)
 
-root, seen = Node(zero()), {}
+
+node_number, root, seen = 0, Node(zero()), {}
 front = [root]
 step = 0
-        
+
+# autre algo non recursif
 # construction de l'arbre en profondeur ou en largeur d'abord
+breadth_first = False # otherwise depth first
+
 EKOX(front[0].board)
 EKOT("building...")
 for istep in range(999999) :
@@ -470,7 +496,7 @@ for istep in range(999999) :
         EKO()
         break
 
-EKOX(node_number)
+EKON(node_number, max_front)
 
 EKON(len(seen), istep)
 def dot(r, fd) :
