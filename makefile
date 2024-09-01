@@ -23,4 +23,5 @@ deploy :
 	-git push
 	-cd $(DEPLOY_DIR); rm -fr trois-couleurs; git clone  https://github.com/louis-chevallier/trois-couleurs.git
 
-
+draw :
+	

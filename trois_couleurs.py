@@ -134,8 +134,8 @@ if False :
     EKOX(pow(factors[-1], 1/(DN*DM - 1)))
     EKOX(('factors', factors))
 factors = np.asarray(factors).reshape((DN, DM))
-EKOX(factors.shape)
-EKOX(('factors', factors))
+#EKOX(factors.shape)
+#EKOX(('factors', factors))
 
 # codage des couleurs
 # 0 : vide, 1, 2, 3 les 3 couleurs
@@ -425,7 +425,7 @@ step = 0
 # construction de l'arbre en profondeur ou en largeur d'abord
 breadth_first = False # otherwise depth first
 
-EKOX(front[0].board)
+#EKOX(front[0].board)
 EKOT("building...")
 for istep in range(999999) :
     #EKOX((step, len(front)))
@@ -509,18 +509,12 @@ def dot(r, fd) :
     for e in r.children :
         fd.write("n" + str(r.number) + " -> n" + str(e.number) + ";\n")
         dot(e, fd)
-
-
-
-        
+     
 EKO()
 check(root, None)
 EKO()
 solve(root)
 EKOX(root.losing)
-
-
-
 
 if False :
     with open('dot.dot', 'w') as f:
