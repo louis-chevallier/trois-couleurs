@@ -1,6 +1,5 @@
-  
-<script type="module">
-  import { w2form, query, w2utils, w2ui, w2popup, w2alert } from 'https://rawgit.com/vitmalina/w2ui/master/dist/w2ui.es6.min.js'
+
+import { w2form, query, w2utils, w2ui, w2popup, w2alert } from 'https://rawgit.com/vitmalina/w2ui/master/dist/w2ui.es6.min.js'
 
 let people = [
     { id: 1, text: 'Adams, John' },
@@ -9,6 +8,25 @@ let people = [
     { id: 4, text: 'Cruz, Steve' },
     { id: 5, text: 'Donnun, Nick' }
 ]
+
+
+
+import { w2grid } from 'https://rawgit.com/vitmalina/w2ui/master/dist/w2ui.es6.min.js'
+
+let grid = new w2grid({
+    name: 'grid',
+    box: '#grid',
+    url: 'data/list.json',
+    method: 'GET', // need this to avoid 412 error on Safari
+    columns: [
+        { field: 'fname', text: 'First Name', size: '30%' },
+        { field: 'lname', text: 'Last Name', size: '30%' },
+        { field: 'email', text: 'Email', size: '40%' },
+        { field: 'sdate', text: 'Start Date', size: '120px' }
+    ]
+});
+
+/*
 let form = new w2form({
     box: '#form',
     name: 'form',
@@ -30,60 +48,60 @@ let form = new w2form({
     },
     fields: [
         { field: 'simple.alpha', type: 'alphaNumeric',
-            html: { label: 'Alpha Numeric', attr: 'style="width: 300px"' }
+          html: { label: 'Alpha Numeric', attr: 'style="width: 300px"' }
         },
         { field: 'simple.text', type: 'text',
-            html: { label: 'Text', attr: 'style="width: 300px"' }
+          html: { label: 'Text', attr: 'style="width: 300px"' }
         },
         { field: 'simple.int', type: 'int',
-            html: { label: 'Integer', attr: 'style="width: 60px"' },
-            options: { arrows: true, min: 0, max: 50 }
+          html: { label: 'Integer', attr: 'style="width: 60px"' },
+          options: { arrows: true, min: 0, max: 50 }
         },
         { field: 'simple.float', type: 'float',
-            html: { label: 'Float', attr: 'style="width: 60px"' },
-            options: { arrows: true, format: true, precision: 2, min: 0, max: 50, step: 0.1 }
+          html: { label: 'Float', attr: 'style="width: 60px"' },
+          options: { arrows: true, format: true, precision: 2, min: 0, max: 50, step: 0.1 }
         },
         { field: 'date.date', type: 'date',
-            html: { label: 'Date', attr: 'style="width: 90px"', text: ' @time' }
+          html: { label: 'Date', attr: 'style="width: 90px"', text: ' @time' }
         },
         { field: 'date.time', type: 'time',
-            html: { anchor: '@time', label: 'Time ', attr: 'style="width: 90px"' }
+          html: { anchor: '@time', label: 'Time ', attr: 'style="width: 90px"' }
         },
         { field: 'date.datetime', type: 'datetime',
-            html: { label: 'Date & Time' }
+          html: { label: 'Date & Time' }
         },
         { field: 'list', type: 'list',
-            html: { label: 'List' },
-            options: { items: w2utils.clone(people) }
+          html: { label: 'List' },
+          options: { items: w2utils.clone(people) }
         },
         { field: 'enum', type: 'enum',
-            html: { label: 'Multiple', attr: 'style="width: 400px"' },
-            options: { openOnFocus: true, items: w2utils.clone(people) }
+          html: { label: 'Multiple', attr: 'style="width: 400px"' },
+          options: { openOnFocus: true, items: w2utils.clone(people) }
         },
         { field: 'file', type: 'file',
-            html: { label: 'Files', attr: 'style="width: 400px"' },
-            options: { maxHeight: 100 }
+          html: { label: 'Files', attr: 'style="width: 400px"' },
+          options: { maxHeight: 100 }
         },
         { field: 'textarea', type: 'textarea',
-            html: { label: 'Text Area', attr: 'style="width: 400px; height: 60px; resize: none"' }
+          html: { label: 'Text Area', attr: 'style="width: 400px; height: 60px; resize: none"' }
         },
         { field: 'select', type: 'select', required: false,
-            html: { label: 'Select', text: ' <-- regular drop down' },
-            options: { items: ['fist', 'second'] }
+          html: { label: 'Select', text: ' <-- regular drop down' },
+          options: { items: ['fist', 'second'] }
         },
         { field: 'single.check', type: 'checkbox',
-            html: { label: 'Check box' }
+          html: { label: 'Check box' }
         },
         { field: 'single.toggle', type: 'toggle',
-            html: { label: 'Toggle' }
+          html: { label: 'Toggle' }
         },
         { field: 'checks', type: 'checks',
-            html: { label: 'Check Boxes' },
-            options: { items: ['Check 1', 'Check 2', 'Check 3', 'Check 4'] }
+          html: { label: 'Check Boxes' },
+          options: { items: ['Check 1', 'Check 2', 'Check 3', 'Check 4'] }
         },
         { field: 'radio', type: 'radio',
-            html: { label: 'Radio Box' },
-            options: { items: ['Radio 1', 'Radio 2', 'Radio 3', 'Radio 4'] }
+          html: { label: 'Radio Box' },
+          options: { items: ['Radio 1', 'Radio 2', 'Radio 3', 'Radio 4'] }
         }
     ],
     actions: {
@@ -110,5 +128,7 @@ let form = new w2form({
             }
         }
     }
-});
-</script>
+})
+*/
+;
+
