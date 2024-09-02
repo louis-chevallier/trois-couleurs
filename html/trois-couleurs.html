@@ -5,9 +5,27 @@
     <link rel="stylesheet" type="text/css" href="https://rawgit.com/vitmalina/w2ui/master/dist/w2ui.min.css">
   </head>
   <body>
-
+    <script src="https://unpkg.com/mathjs@13.1.1/lib/browser/math.js"></script>
     <div id="form" style="width: 750px;"></div>
-    <script src="/deploy/server_https/html/js/lclog.js" charset="utf-8"></script>    
+    <script src="/deploy/server_https/html/js/lclog.js" charset="utf-8"></script>
+
+
+
+    <script>
+      function print(value) {
+          const precision = 14
+          document.write(math.format(value, precision) + '<br>')
+      }
+      
+      // functions and constants
+      print(math.round(math.e, 3))            // 2.718
+      print(math.atan2(3, -3) / math.pi)      // 0.75
+      print(math.log(10000, 10))              // 4
+      print(math.sqrt(-4))                    // 2i
+      print(math.pow([[-1, 2], [3, 1]], 2))   // [[7, 0], [0, 7]]
+      print(math.derivative('x^2 + x', 'x'))  // 2 * x + 1
+    </script>
+    
     <script type="module" src='code.js'>    </script>
   </body>
 </html>
