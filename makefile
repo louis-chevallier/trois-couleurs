@@ -29,3 +29,10 @@ deploy :
 copy :
 	-cp -r html $(DEPLOY_DIR)/trois-couleurs
 
+# /mnt/hd1/tools/
+# nvm install 20
+# npm install mathjs
+# 
+run :
+	node html/code.js
+

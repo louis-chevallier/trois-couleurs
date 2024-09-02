@@ -3,7 +3,7 @@ import numpy as np
 from utillc import *
 import sys
 import sympy
-from sympy import symbols, lambdify, Integer
+from sympy import symbols, lambdify, Integer, python
 import matplotlib.pyplot as plt 
 from typing import TypeVar
 import numpy as np
@@ -59,7 +59,7 @@ et
 
 """
 
-def rot_func(t) :
+def rot_func1(t) :
     """
     calcul d'une rotation des couleurs en utilisant un polynome
     p(x) = a + b x + c x*x + d * x*x*x
@@ -90,13 +90,26 @@ def rot_func(t) :
     #EKOX(f1(3))
     
     f1j = jit(f1, nopython=True)
-    return f1j
+    return f1j, f1, p.subs(s)
+
+def rot_func(x) :
+    return rot_func1(x)[0]
+
+
+EKOX(python(rot_func1((2, 3, 1))[2]))
+EKOX(python(rot_func1((1, 3, 2))[2]))
+
 
 
 # pour construire toutes les variantes équivalentes en couleur d'une position
 #EKO()
 crotf_ =  rot_func((2, 3, 1))
 crot2f_ = rot_func((1, 3, 2))
+
+# dump du résultat de sympy 
+crotf_ = lambda x : -x**3/3 + x**2/2 + 11*x/6
+crot2f_ = lambda x : -2*x**3/3 + 5*x**2/2 - 5*x/6
+
 crotf = lambda x : np.round(crotf_(x)).astype(np.uint8) 
 crot2f = lambda x : np.round(crot2f_(x)).astype(np.uint8)
 
@@ -115,7 +128,7 @@ EKOX(crot2f(crotf(aa)))
 EKON([ crotf(x) for x in range(4)])
 EKOX([ crot2f(x) for x in range(4)])
 """
-DDD = 4
+DDD = 1
 
 DN,DM = DDD, DDD # DN == DM car le calcul de symetries l'obligent
 DN_ = Literal[DN]

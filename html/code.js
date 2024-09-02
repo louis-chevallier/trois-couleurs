@@ -1,210 +1,54 @@
 
-import { w2form, query, w2utils, w2ui, w2popup, w2alert } from 'https://rawgit.com/vitmalina/w2ui/master/dist/w2ui.es6.min.js'
-
-let people = [
-    { id: 1, text: 'Adams, John' },
-    { id: 2, text: 'Johnson, Peter' },
-    { id: 3, text: 'Lewis, Frank' },
-    { id: 4, text: 'Cruz, Steve' },
-    { id: 5, text: 'Donnun, Nick' }
-]
 
 
-
-import { w2grid } from 'https://rawgit.com/vitmalina/w2ui/master/dist/w2ui.es6.min.js'
-
-let grid = new w2grid({
-    name: 'grid',
-    box: '#grid',
-    url: 'data/list.json',
-    method: 'GET', // need this to avoid 412 error on Safari
-    columns: [
-        { field: 'fname', text: 'First Name', size: '30%' },
-        { field: 'lname', text: 'Last Name', size: '30%' },
-        { field: 'email', text: 'Email', size: '40%' },
-        { field: 'sdate', text: 'Start Date', size: '120px' }
-    ]
-});
-
-/*
-let form = new w2form({
-    box: '#form',
-    name: 'form',
-    url: 'server/post',
-    header: 'Field Types',
-    record: {
-        simple: {
-            text: 'default text value',
-            alpha: 'ABC123',
-            int: null,
-            float: 0
-        },
-        single: {
-            check: true,
-            toggle: true
-        },
-        list: 3,
-        enum: [1, 4]
-    },
-    fields: [
-        { field: 'simple.alpha', type: 'alphaNumeric',
-          html: { label: 'Alpha Numeric', attr: 'style="width: 300px"' }
-        },
-        { field: 'simple.text', type: 'text',
-          html: { label: 'Text', attr: 'style="width: 300px"' }
-        },
-        { field: 'simple.int', type: 'int',
-          html: { label: 'Integer', attr: 'style="width: 60px"' },
-          options: { arrows: true, min: 0, max: 50 }
-        },
-        { field: 'simple.float', type: 'float',
-          html: { label: 'Float', attr: 'style="width: 60px"' },
-          options: { arrows: true, format: true, precision: 2, min: 0, max: 50, step: 0.1 }
-        },
-        { field: 'date.date', type: 'date',
-          html: { label: 'Date', attr: 'style="width: 90px"', text: ' @time' }
-        },
-        { field: 'date.time', type: 'time',
-          html: { anchor: '@time', label: 'Time ', attr: 'style="width: 90px"' }
-        },
-        { field: 'date.datetime', type: 'datetime',
-          html: { label: 'Date & Time' }
-        },
-        { field: 'list', type: 'list',
-          html: { label: 'List' },
-          options: { items: w2utils.clone(people) }
-        },
-        { field: 'enum', type: 'enum',
-          html: { label: 'Multiple', attr: 'style="width: 400px"' },
-          options: { openOnFocus: true, items: w2utils.clone(people) }
-        },
-        { field: 'file', type: 'file',
-          html: { label: 'Files', attr: 'style="width: 400px"' },
-          options: { maxHeight: 100 }
-        },
-        { field: 'textarea', type: 'textarea',
-          html: { label: 'Text Area', attr: 'style="width: 400px; height: 60px; resize: none"' }
-        },
-        { field: 'select', type: 'select', required: false,
-          html: { label: 'Select', text: ' <-- regular drop down' },
-          options: { items: ['fist', 'second'] }
-        },
-        { field: 'single.check', type: 'checkbox',
-          html: { label: 'Check box' }
-        },
-        { field: 'single.toggle', type: 'toggle',
-          html: { label: 'Toggle' }
-        },
-        { field: 'checks', type: 'checks',
-          html: { label: 'Check Boxes' },
-          options: { items: ['Check 1', 'Check 2', 'Check 3', 'Check 4'] }
-        },
-        { field: 'radio', type: 'radio',
-          html: { label: 'Radio Box' },
-          options: { items: ['Radio 1', 'Radio 2', 'Radio 3', 'Radio 4'] }
-        }
-    ],
-    actions: {
-        Reset() {
-            this.clear();
-        },
-        Save() {
-            if (form.validate().length == 0) {
-                w2popup.open({
-                    title: 'Form Data',
-                    with: 600,
-                    height: 550,
-                    body: `<pre>${JSON.stringify(this.getCleanRecord(), null, 4)}</pre>`,
-                    actions: { Ok: w2popup.close }
-                })
-            }
-        },
-        custom: {
-            text: '<span style="font-size: 16px">←</span> click to see data',
-            class: 'custom-class',
-            style: 'background-image: none; background-color: transparent; border: 0px; margin: 0 0 0 -10px;',
-            onClick() {
-                w2alert('Not me!! The other button')
-            }
-        }
-    }
-})
-*/
-;
-
-//import * as math from 'mathjs';
+import * as math from 'mathjs';
 
 const List = (x) => Array.from(x);
 
 // Generic dimension sizes types
 const ROWS = 2;
 const COLS = 3;
-const A = Array.from({ length: ROWS }, () => Array(COLS).fill(0));
-const B = Array.from({ length: COLS }, () => Array(ROWS).fill(0));
+const A = math.zeros([ROWS, COLS]);
+const B = math.zeros([COLS, ROWS]);
 const C = math.multiply(A, B);
 
-// Placeholder for utillc.print_everything()
-console.log("Print everything function called");
 
-function rot_func(t) {
-    const [p1, p2, p3] = t;
-    const a = math.symbol('a');
-    const b = math.symbol('b');
-    const c = math.symbol('c');
-    const d = math.symbol('d');
-    const x = math.symbol('x');
-    
-    const eq = [
-        a,
-        math.add(math.add(math.add(a, b), c), d).subtract(p1),
-        math.add(math.add(math.add(a, math.multiply(2, b)), math.multiply(4, c)), math.multiply(8, d)).subtract(p2),
-        math.add(math.add(math.add(a, math.multiply(3, b)), math.multiply(9, c)), math.multiply(27, d)).subtract(p3)
-    ];
-    
-    const p = math.add(a, math.add(math.multiply(b, x), math.add(math.multiply(c, math.pow(x, 2)), math.multiply(d, math.pow(x, 3)))));
-    const s = math.solve(eq, [a, b, c, d]);
-    
-    const f1 = (x) => p.subs(s);
-    
-    return f1;
-}
+const crotf_ = (x) => -(x ** 3) / 3 + x ** 2 / 2 + 11 * x / 6;
+const crot2f_ = (x) => -2 * x ** 3 / 3 + 5 * x ** 2 / 2 - 5 * x / 6;
 
-const crotf_ = rot_func([2, 3, 1]);
-const crot2f_ = rot_func([1, 3, 2]);
-const crotf = (x) => Math.round(crotf_(x)).toString(2);
-const crot2f = (x) => Math.round(crot2f_(x)).toString(2);
+const crotf = (x) => Math.round(crotf_(x));
+const crot2f = (x) => Math.round(crot2f_(x));
 
 const ar = (x) => Array.from(x);
 const aa1 = ar([0, 1, 2, 3]);
 
-const DDD = 4;
+const DDD = 1;
 const DN = DDD, DM = DDD; // DN == DM car le calcul de symetries l'obligent
 const taille_plateau = [DN, DM];
 console.assert(DN === DM); // on veut un tableau carré because, on gere pas les rotations autrement
 
-const TT = Array.from({ length: DN }, () => Array(DM).fill(0));
-console.log("EKON called with taille_plateau");
+const TT = Array(DN).fill().map(() => Array(DM).fill(0));
+EKON(taille_plateau);
 
-let factors = Array.from({ length: DN * DM }, (_, i) => Math.pow(4, i));
-factors = Array.from({ length: DN }, (_, i) => factors.slice(i * DM, (i + 1) * DM));
+let factors = Array.from({ length: DN * DM }, (_, i) => 4 ** i);
+factors = math.reshape(factors, [DN, DM]);
 
-// codage des couleurs
 const colors = new Set([1, 2, 3]);
 
 function hh(b) {
-    const xx = b.map((row, i) => row.map((val, j) => val * factors[i][j])).flat();
-    return xx.reduce((acc, val) => acc + val, 0);
+    const xx = math.multiply(b, factors);
+    return math.sum(xx);
 }
 
 function random() {
-    const b = Array.from({ length: DN }, () => Array.from({ length: DM }, () => Math.round(Math.random() * 3)));
+    const b = math.random([DN, DM]).map(row => row.map(val => Math.round(val * 3)));
     return b;
 }
 
 const aa = random();
 
 function zero() {
-    return Array.from({ length: DN }, () => Array(DM).fill(0));
+    return Array(DN).fill().map(() => Array(DM).fill(0));
 }
 
 function normal(bb) {
@@ -214,26 +58,27 @@ function normal(bb) {
     }
     
     const b = bb;
-    const b1 = b.map(row => row.slice().reverse());
-    const b2 = b.map(row => row.reverse());
-    const b3 = b[0].map((_, colIndex) => b.map(row => row[colIndex])).reverse();
-    const b4 = b3.map(row => row.slice().reverse());
-    const b5 = b4.map(row => row.slice().reverse());
+    const b1 = b.reverse();
+    const b2 = b[0].map((_, colIndex) => b.map(row => row[colIndex])).reverse();
+    const b3 = b.map((row, rowIndex) => row.map((_, colIndex) => b[b.length - 1 - colIndex][rowIndex]));
+    const b4 = b3.map((row, rowIndex) => row.map((_, colIndex) => b3[b3.length - 1 - colIndex][rowIndex]));
+    const b5 = b4.map((row, rowIndex) => row.map((_, colIndex) => b4[b4.length - 1 - colIndex][rowIndex]));
     const b6 = b[0].map((_, colIndex) => b.map(row => row[colIndex]));
-    const b7 = b.map(row => row.slice().reverse()).map(row => row.slice().reverse());
+    const b7 = b.map(row => row.reverse()).map((row, rowIndex) => row.map((_, colIndex) => b[rowIndex][b[rowIndex].length - 1 - colIndex]));
     
-    const l = List([b, b1, b2, b3, b4, b5, b6, b7]);
+    const l = [b, b1, b2, b3, b4, b5, b6, b7];
     const l0 = l;
     const l1 = l.map(crotf);
     const l2 = l1.map(crotf);
     const l3 = l.map(crot2f);
     const l4 = l3.map(crotf);
     const l5 = l1.map(crot2f);
-    const ss = [...l0, ...l1, ...l2, ...l3, ...l4, ...l5].map(hh).sort();
+    const ss = [...l0, ...l1, ...l2, ...l3, ...l4, ...l5].map(hh);
+    ss.sort();
     return ss[0];
 }
 
-var node_number = 0;
+let node_number = 0;
 function inc() {
     return node_number++;
 }
@@ -242,7 +87,7 @@ class Node {
     constructor(b, father = null) {
         this.number = inc();
         this.board = b;
-        this.losing = "?";
+        this.losing = "?"; // pour celui qui doit jouer dans cette position
         this.father = father;
         this.children = [];
         this.friend = null;
@@ -262,7 +107,7 @@ class Node {
     }
 
     empty() {
-        return this.board.flatMap((row, y) => row.map((val, x) => (val === 0 ? [y, x] : null))).filter(Boolean);
+        return this.board.flatMap((row, rowIndex) => row.map((val, colIndex) => (val === 0 ? [rowIndex, colIndex] : null))).filter(x => x);
     }
 
     neighbours(c, filled = true) {
@@ -282,8 +127,14 @@ class Node {
         const res = [];
         for (const c of e) {
             const nb = this.neighbours(c, true);
-            const nbTransposed = nb[0].map((_, colIndex) => nb.map(row => row[colIndex]));
-            const colors_available = nbTransposed.length === 0 ? colors : new Set([...colors].filter(color => !new Set(nbTransposed.map(([yy, xx]) => this.board[yy][xx])).has(color)));
+            const nbT = nb.map(([yy, xx]) => [yy, xx]);
+            let colors_available;
+            if (nbT.length === 0) {
+                colors_available = colors;
+            } else {
+                const colors_around = new Set(nbT.map(([yy, xx]) => this.board[yy][xx]));
+                colors_available = new Set([...colors].filter(x => !colors_around.has(x)));
+            }
             for (const e of colors_available) res.push([c, e]);
         }
         return res;
@@ -308,7 +159,7 @@ class Node {
 let max_front = 1;
 let min_empty_cells = DN * DM * 12;
 
-let cc = [];
+const cc = [];
 
 function parse(r, tab) {
     if (normal(r) in seen) {
@@ -321,7 +172,7 @@ function parse(r, tab) {
 }
 
 function dump(n, t = "") {
-    console.log(normal(n.board), n.level());
+    EKON(normal(n.board), n.level());
     for (const e of n.children) {
         dump(e, t + "\t");
     }
@@ -367,8 +218,8 @@ function recursive_build(p) {
             }
         }
     } else {
-        console.log(min_empty_cells, seen.length, nn, istep);
-        console.log(p.board);
+        EKON(min_empty_cells, len(seen), nn, istep);
+        EKOX(p.board);
     }
 }
 
@@ -389,11 +240,79 @@ node_number = 0;
 const root = new Node(zero());
 const seen = {};
 
-console.log("building recursif...");
+EKOT("building recursif...");
 recursive_build(root);
-console.log(seen.length);
-console.log(step_count);
-console.log(node_number);
+EKON(len(seen));
+EKOX(step_count);
+EKOX(node_number);
 solve(root);
-console.log(root.losing);
+EKOX(root.losing);
 
+node_number = 0;
+const front = [root];
+let step = 0;
+
+if (false) {
+    EKOT("building...");
+    for (let istep = 0; istep < 999999; istep++) {
+        const p = front.shift();
+        const nn = normal(p.board);
+
+        const empy_cells_num = p.board.flat().filter(x => x === 0).length;
+
+        if (empy_cells_num >= 0) {
+            if (nn in seen) {
+                console.assert(seen[nn].level() === p.level());
+                p.chain(seen[nn]);
+            } else {
+                seen[nn] = p;
+                const ms = p.possible_moves();
+                if (ms.length === 0) {
+                    p.losing = true;
+                } else {
+                    const nexts = ms.map(m => new Node(p.apply(m), p));
+                    front.push(...nexts);
+                }
+            }
+            step++;
+            max_front = Math.max(max_front, front.length);
+            cc.push(front.length);
+        } else {
+            EKON(min_empty_cells, len(seen), nn, istep);
+            EKOX(p.board);
+        }
+
+        if (front.length === 0) {
+            EKO();
+            break;
+        }
+    }
+
+    EKON(node_number, max_front);
+    EKON(len(seen), istep);
+    EKO();
+    check(root, null);
+    EKO();
+    solve(root);
+    EKOX(root.losing);
+}
+
+function dot(r, fd) {
+    const status = r.losing ? "L" : "W";
+    const nrm = normal(r.board);
+    const ref = nrm in seen ? "ref:" + seen[nrm].name() : "";
+    const board = String(r.board);
+    const bb = "";
+    fd.write(`${r.name()} [ label="${r.name()} ${status} \\n ${bb} ${ref}"]`);
+    for (const e of r.children) {
+        fd.write(`n${r.number} -> n${e.number};\n`);
+        dot(e, fd);
+    }
+}
+
+if (false) {
+    const f = fs.createWriteStream('dot.dot');
+    f.write("digraph troiscouleurs {");
+    dot(root, f);
+    f.write("}");
+}
