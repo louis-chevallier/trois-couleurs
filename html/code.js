@@ -131,7 +131,8 @@ let form = new w2form({
 })
 */
 ;
-import * as math from 'mathjs';
+
+//import * as math from 'mathjs';
 
 const List = (x) => Array.from(x);
 
