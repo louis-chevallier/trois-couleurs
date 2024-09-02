@@ -408,7 +408,7 @@ def solve(r) :
 
 node_number, root, seen = 0, Node(zero()), {}
 
-EKOT("re building...")
+EKOT("building recursif...")
 recursive_build(root)
 EKON(len(seen))
 EKOX(step_count)
@@ -421,84 +421,93 @@ node_number, root, seen = 0, Node(zero()), {}
 front = [root]
 step = 0
 
-# autre algo non recursif
-# construction de l'arbre en profondeur ou en largeur d'abord
-breadth_first = False # otherwise depth first
+if False :
+    # autre algo non recursif
+    # construction de l'arbre en profondeur ou en largeur d'abord
+    breadth_first = False # otherwise depth first
 
-#EKOX(front[0].board)
-EKOT("building...")
-for istep in range(999999) :
-    #EKOX((step, len(front)))
-    p = front.pop(0)
-    nn = normal(p.board)
+    # pruning alpha beta pas fait
 
-    empy_cells_num = (p.board == 0).sum()
-    #EKON(empy_cells_num, min_empty_cells)
-    if p.eq("1201") :    EKO()
-    #EKOX(step)
-    #EKOX(parse(root, ""))
-    #check(root, None)
+    #EKOX(front[0].board)
+    EKOT("building...")
+    for istep in range(999999) :
+        #EKOX((step, len(front)))
+        p = front.pop(0)
+        nn = normal(p.board)
 
-    """
-    if empy_cells_num < min_empty_cells :
-        min_empty_cells = min(min_empty_cells, empy_cells_num)
-        EKON(min_empty_cells, len(seen), len(front), istep)
-        EKOX(p.board)
-    """ 
+        empy_cells_num = (p.board == 0).sum()
+        #EKON(empy_cells_num, min_empty_cells)
+        #if p.eq("1201") :    EKO()
+        #EKOX(step)
+        #EKOX(parse(root, ""))
+        #check(root, None)
 
-    if empy_cells_num >= 0 :
-        if nn in seen :
-            assert(seen[nn].level() == p.level())
+        """
+        if empy_cells_num < min_empty_cells :
+            min_empty_cells = min(min_empty_cells, empy_cells_num)
+            EKON(min_empty_cells, len(seen), len(front), istep)
+            EKOX(p.board)
+        """ 
 
-            # on a déjà traité un noeud de clé identique : q = seen[nn]
-            # pas besoin de poursuivre
-            p.chain(ref = seen[nn]);
-            #EKOX(p.eq("1201"))
-            #EKOX(step)
-            #EKOX(seen[nn].board)
-            #EKOX(p.board)
-            #EKOX(parse(seen[nn], ''))
-            #EKOX(parse(p, ''))
-        else :
-            seen[nn] = p            
-            ms = p.possible_moves()
-            if len(ms) == 0 :
-                p.losing = True
+        if empy_cells_num >= 0 :
+            if nn in seen :
+                assert(seen[nn].level() == p.level())
+
+                # on a déjà traité un noeud de clé identique : q = seen[nn]
+                # pas besoin de poursuivre
+                p.chain(ref = seen[nn]);
+                #EKOX(p.eq("1201"))
+                #EKOX(step)
+                #EKOX(seen[nn].board)
+                #EKOX(p.board)
+                #EKOX(parse(seen[nn], ''))
+                #EKOX(parse(p, ''))
             else :
-                nexts = [ Node(p.apply(m), p) for m in ms]
-                if breadth_first :
-                    front = front + nexts
+                seen[nn] = p            
+                ms = p.possible_moves()
+                if len(ms) == 0 :
+                    p.losing = True
                 else :
-                    front = nexts + front
+                    nexts = [ Node(p.apply(m), p) for m in ms]
+                    if breadth_first :
+                        front = front + nexts
+                    else :
+                        front = nexts + front
 
-        #EKOX(len(seen))
-        step += 1
+            #EKOX(len(seen))
+            step += 1
 
-        #if len(front) > max_front :        EKOX(len(front))
-        max_front = max(max_front, len(front))
-        cc.append(len(front))
+            #if len(front) > max_front :        EKOX(len(front))
+            max_front = max(max_front, len(front))
+            cc.append(len(front))
 
-        #if len(seen) > 10000 : break
-        """
-        if len(cc) % 100000  == 0:
-            plt.plot(cc)
-            plt.show()
-        """
-    else :
-        # terminal node
-        EKON(min_empty_cells, len(seen), nn, istep)
-        EKOX(p.board)
-        
-    if len(front) == 0  :
-        #EKOT("seen %d" % len(seen))
-        #plt.plot(cc)
-        #plt.show()
-        EKO()
-        break
+            #if len(seen) > 10000 : break
+            """
+            if len(cc) % 100000  == 0:
+                plt.plot(cc)
+                plt.show()
+            """
+        else :
+            # terminal node
+            EKON(min_empty_cells, len(seen), nn, istep)
+            EKOX(p.board)
 
-EKON(node_number, max_front)
+        if len(front) == 0  :
+            #EKOT("seen %d" % len(seen))
+            #plt.plot(cc)
+            #plt.show()
+            EKO()
+            break
 
-EKON(len(seen), istep)
+    EKON(node_number, max_front)
+
+    EKON(len(seen), istep)
+    EKO()
+    check(root, None)
+    EKO()
+    solve(root)
+    EKOX(root.losing)
+
 def dot(r, fd) :
     status = "L" if r.losing else "W"
     nrm = normal(r.board)
@@ -510,11 +519,6 @@ def dot(r, fd) :
         fd.write("n" + str(r.number) + " -> n" + str(e.number) + ";\n")
         dot(e, fd)
      
-EKO()
-check(root, None)
-EKO()
-solve(root)
-EKOX(root.losing)
 
 if False :
     with open('dot.dot', 'w') as f:
@@ -523,12 +527,6 @@ if False :
         f.write("}")
     
 
-
-#check(root, None, {})
-
-
-
-#EKOX(parse(root, ""))
 
 
 
