@@ -1,4 +1,4 @@
-DEPLOY_DIR = /deploy
+DEPLOY_DIR = /deploy/trois-couleurs
 export DATE:=$(shell date +%Y-%m-%d_%Hh%Mm%Ss)
 export HOST=$(shell hostname)
 SHELL=bash
@@ -24,7 +24,7 @@ push :
 	-git push
 
 deploy :
-	-cd $(DEPLOY_DIR); rm -fr trois-couleurs; git clone  https://github.com/louis-chevallier/trois-couleurs.git
+	-rm -fr $(DEPLOY_DIR); mkdir $(DEPLOY_DIR); git archive HEAD | tar -x -C $(DEPLOY_DIR)
 
 copy :
 	-cp -r html $(DEPLOY_DIR)/trois-couleurs
