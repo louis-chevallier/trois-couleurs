@@ -27,7 +27,7 @@ deploy :
 	-rm -fr $(DEPLOY_DIR); mkdir $(DEPLOY_DIR); git archive HEAD | tar -x -C $(DEPLOY_DIR)
 
 copy :
-	-cp -r html $(DEPLOY_DIR)/trois-couleurs
+	-cp -r html $(DEPLOY_DIR)
 
 # /mnt/hd1/tools/
 # nvm install 20

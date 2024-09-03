@@ -1,4 +1,91 @@
-import * as math from 'mathjs';
+//import * as math from 'mathjs';
+
+const D = 2;
+
+const tableau = new Array(D).fill(0).map(() => new Array(D).fill(0));
+var buttons = [];
+var clicked = [];
+
+var color = 0;
+
+function addbutton(txt, x, y) {
+    // Create a button element
+    const nbutton = document.createElement('button');
+    nbutton.innerText = txt;
+    //console.log(nbutton);
+    nbutton.style.position = "absolute";
+    nbutton.style.left = x + 'px';
+    nbutton.style.top = y + 'px';
+    nbutton.style.fontSize = "70px";
+    nbutton.style.backgroundColor = 'White';
+    buttons.push(nbutton);
+    document.body.appendChild(nbutton);
+    return nbutton;
+};
+
+const hue = { 0 : 'Red', 1 : "Blue", 2 : "Yellow"};
+
+function select(r, bg) {
+    EKOX(r);
+    color = bg;
+    for (const e of bcolors) {
+        EKOX(e);
+        e.style.boxShadow = "0px 0px 0px rgba(0, 0, 0, 0.4)";
+    }
+    r.style.boxShadow = "10px 10px 10px rgba(0, 0, 0, 0.4)";        
+}    
+
+
+function addbutton1(x, y, bg) {
+    const r = addbutton("c", x, y);
+    r.style.backgroundColor = hue[bg];
+    r.style.borderRadius = "50%";
+    r.addEventListener('click', function() {
+        EKOX(this);
+        select(this, bg);
+    });
+    
+    return r;
+}
+
+function addbutton2(txt, x, y) {
+    let [i,j] = txt;
+    const r = addbutton(txt, x, y);
+    r.addEventListener('click', function() {
+        EKOX(i, j, color);
+        this.style.backgroundColor = hue[color];
+    });
+    
+    return r;
+}
+
+const W  =100;
+const H  =100;
+const ML =  100;
+const MH = 120;
+
+const bcolors = [
+    addbutton1(50, 50, 0),
+    addbutton1(150, 50, 1),
+    addbutton1(250, 50, 2),
+];
+select(bcolors[0], 0);
+
+//console.log("create buttons");
+for (var i = 1; i <= D; i++) {
+    for (var j = 1; j <= D; j++) {
+        //console.log(i);
+        //EKOX(i, j);
+        tableau[i, j] = addbutton2([i,j], i* W + ML, j * H + MH);
+    }
+}                        
+
+
+function click(x) {
+    ekox(x);
+    
+}
+
 
 const List = (x) => Array.from(x);
 
@@ -19,17 +106,18 @@ const crot2f = (x) => Math.round(crot2f_(x));
 const ar = (x) => Array.from(x);
 const aa1 = ar([0, 1, 2, 3]);
 
-const DDD = 1;
+const DDD = D;
 const DN = DDD, DM = DDD; // DN == DM car le calcul de symetries l'obligent
 const taille_plateau = [DN, DM];
 console.assert(DN === DM); // on veut un tableau carré because, on gere pas les rotations autrement
 
 const TT = Array(DN).fill().map(() => Array(DM).fill(0));
-EKON(taille_plateau);
+EKOX(taille_plateau);
 
 let factors = Array.from({ length: DN * DM }, (_, i) => 4 ** i);
+EKOX(factors);
 factors = math.reshape(factors, [DN, DM]);
-
+EKOX(factors);
 const colors = new Set([1, 2, 3]);
 
 function hh(b) {
@@ -190,11 +278,13 @@ function plus() {
 function recursive_build(p) {
     const istep = plus();
     const nn = normal(p.board);
-
+    EKOX(nn);
     const empy_cells_num = p.board.flat().filter(x => x === 0).length;
-
+    
     if (empy_cells_num >= 0) {
         if (nn in seen) {
+            EKOX(seen[nn].level());
+            EKOX(p.level());
             console.assert(seen[nn].level() === p.level());
             p.chain(seen[nn]);
         } else {
@@ -215,7 +305,7 @@ function recursive_build(p) {
             }
         }
     } else {
-        EKON(min_empty_cells, len(seen), nn, istep);
+        EKOX(min_empty_cells, len(seen), nn, istep);
         EKOX(p.board);
     }
 }
@@ -237,9 +327,9 @@ node_number = 0;
 const root = new Node(zero());
 const seen = {};
 
-EKOT("building recursif...");
+EKOX("building recursif...");
 recursive_build(root);
-EKON(len(seen));
+EKOX(seen.length);
 EKOX(step_count);
 EKOX(node_number);
 solve(root);
@@ -248,68 +338,3 @@ EKOX(root.losing);
 node_number = 0;
 const front = [root];
 let step = 0;
-
-if (false) {
-    EKOT("building...");
-    for (let istep = 0; istep < 999999; istep++) {
-        const p = front.shift();
-        const nn = normal(p.board);
-
-        const empy_cells_num = p.board.flat().filter(x => x === 0).length;
-
-        if (empy_cells_num >= 0) {
-            if (nn in seen) {
-                console.assert(seen[nn].level() === p.level());
-                p.chain(seen[nn]);
-            } else {
-                seen[nn] = p;
-                const ms = p.possible_moves();
-                if (ms.length === 0) {
-                    p.losing = true;
-                } else {
-                    const nexts = ms.map(m => new Node(p.apply(m), p));
-                    front.push(...nexts);
-                }
-            }
-            step++;
-            max_front = Math.max(max_front, front.length);
-            cc.push(front.length);
-        } else {
-            EKON(min_empty_cells, len(seen), nn, istep);
-            EKOX(p.board);
-        }
-
-        if (front.length === 0) {
-            EKO();
-            break;
-        }
-    }
-
-    EKON(node_number, max_front);
-    EKON(len(seen), istep);
-    EKO();
-    check(root, null);
-    EKO();
-    solve(root);
-    EKOX(root.losing);
-}
-
-function dot(r, fd) {
-    const status = r.losing ? "L" : "W";
-    const nrm = normal(r.board);
-    const ref = nrm in seen ? "ref:" + seen[nrm].name() : "";
-    const board = String(r.board);
-    const bb = "";
-    fd.write(`${r.name()} [ label="${r.name()} ${status} \\n ${bb} ${ref}"]`);
-    for (const e of r.children) {
-        fd.write(`n${r.number} -> n${e.number};\n`);
-        dot(e, fd);
-    }
-}
-
-if (false) {
-    const f = fs.createWriteStream('dot.dot');
-    f.write("digraph troiscouleurs {");
-    dot(root, f);
-    f.write("}");
-}
