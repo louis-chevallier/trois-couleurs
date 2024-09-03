@@ -36,3 +36,6 @@ copy :
 run :
 	node html/code.js
 
+
+doc :
+	pandoc README.md --to=pdf -o README.pdf

@@ -1,16 +1,4 @@
-
-
-
 import * as math from 'mathjs';
-
-
-
-
-
-
-
-
-
 
 const List = (x) => Array.from(x);
 

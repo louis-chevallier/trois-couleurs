@@ -128,7 +128,7 @@ EKOX(crot2f(crotf(aa)))
 EKON([ crotf(x) for x in range(4)])
 EKOX([ crot2f(x) for x in range(4)])
 """
-DDD = 1
+DDD = 4
 
 DN,DM = DDD, DDD # DN == DM car le calcul de symetries l'obligent
 DN_ = Literal[DN]
@@ -374,6 +374,9 @@ def recursive_build(p : Node) :
     #EKOX(step)
     #EKOX(parse(root, ""))
     #check(root, None)
+
+    if node_number in  [ 2**i for i in range(1,30)] :
+        EKOX(node_number)
 
     if empy_cells_num >= 0 :
         if nn in seen :
