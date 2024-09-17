@@ -6,10 +6,15 @@ export GITINFO=$(shell git log --pretty=format:"%h - %an, %ar : %s" -1)
 WOD='$(shell fortune -s | sed -e 's/["]//g' | sed -e "s/[']//g")'
 
 
+
+
 compile : setup.py trois_couleurs.py
 #	python setup.py build_ext --inplace
 	cython trois_couleurs.py
 	time python -c 'import trois_couleurs'
+
+bench : 
+	python -m cProfile -o results.prof trois_couleurs.py
 
 start :
 	time python trois_couleurs.py
