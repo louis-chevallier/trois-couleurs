@@ -1,4 +1,4 @@
-# le jeux des trois couleurs
+# le jeux des trois couleurs, resolution et jeu interactif
 
 Sur un tableau carré, les joueurs jouent tour à tour en coloriant une case libre en choisissant une parmi 3 couleurs.
 2 cases voisines selon le 4-voisinage ne peuvent être de la même couleur.
